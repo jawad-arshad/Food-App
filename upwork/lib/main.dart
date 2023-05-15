@@ -1,19 +1,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:upwork/providers/cart_provider.dart';
-import 'package:upwork/view/cart_screen.dart';
+import 'package:FoodApp/providers/cart_provider.dart';
+import 'package:FoodApp/view/cart_screen.dart';
 
 void main() async {
 
   runApp(MultiProvider(
     providers: [ChangeNotifierProvider(create: (context) => CartProvider())],
-    child: const ChickenPizzaApp(),
+    child: const FoodApp(),
   ));
 }
 
-class ChickenPizzaApp extends StatelessWidget {
-  const ChickenPizzaApp({super.key});
+class FoodApp extends StatelessWidget {
+  const FoodApp({super.key});
 
   @override
   Widget build(BuildContext context) {
