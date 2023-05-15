@@ -23,53 +23,57 @@ class CartProvider with ChangeNotifier {
   }
 
   void removeItem(CartCellModel item) {
-    items.remove(item);
     if (item.foodItemModel.name == "Salad") {
+      if (items.isEmpty) {
+        totalPrice = 0;
+        appliedCouponModel = CouponModel();
+      }
       items.remove(item);
       notifyListeners();
       return;
-    }
-    totalPrice -= item.foodItemModel.price;
-    if (totalPrice >= 500 && appliedCouponModel.level == 1) {
-      totalPrice = calculateDiscountedPrice(totalPrice, 10);
-    } else if (totalPrice >= 1000 && appliedCouponModel.level == 2) {
-      totalPrice = calculateDiscountedPrice(totalPrice, 20);
-    }
+    } else {
+      items.remove(item);
+      totalPrice -= item.foodItemModel.price;
+      double couponDiscount = 0.0;
+      if (totalPrice >= 500 && appliedCouponModel.level == 1) {
+        couponDiscount = calculateDiscountedPrice(totalPrice, 10);
+      } else if (totalPrice >= 1000 && appliedCouponModel.level == 2) {
+        couponDiscount = calculateDiscountedPrice(totalPrice, 20);
+      }
+      totalPrice -= couponDiscount;
 
-    if (items.isEmpty) {
-      totalPrice = 0;
-      appliedCouponModel = CouponModel();
+      if (items.isEmpty) {
+        totalPrice = 0;
+        appliedCouponModel = CouponModel();
+      }
     }
 
     notifyListeners();
   }
 
-  double  applyCoupon(CouponModel couponModel) {
+  bool couponApplied = false;
+  double couponValue = 0.0;
+
+  double applyCoupon(CouponModel couponModel) {
     appliedCouponModel = couponModel;
     if (totalPrice >= 500 && couponModel.level == 1) {
-      double discount = totalPrice -= totalPrice * 0.1;
+      couponValue = 0.0;
+      couponValue = totalPrice -= totalPrice * 0.1;
+      couponApplied = true;
       notifyListeners();
-      return discount;
+      return couponValue;
     } else if (totalPrice >= 1000 && couponModel.level == 2) {
-      double discount = totalPrice -= totalPrice * 0.2;
+      couponValue = 0.0;
+      couponValue = totalPrice -= totalPrice * 0.2;
+      couponApplied = true;
       notifyListeners();
-      return discount;
+      return couponValue;
     } else {
+      couponValue = 0.0;
+      couponApplied = false;
       notifyListeners();
       return 0.0;
     }
-  }
-
-
-   double get couponDiscount {
-    if (appliedCouponModel != null) {
-      if (totalPrice >= 1000 && appliedCouponModel.level == 2) {
-        return calculateDiscountedPrice(totalPrice, appliedCouponModel.discount);
-      } else if (totalPrice >= 500 && appliedCouponModel.level == 1) {
-        return calculateDiscountedPrice(totalPrice, appliedCouponModel.discount);
-      }
-    }
-    return 0;
   }
 
   FoodItemModel _checkFreeItem(FoodItemModel dish) {

@@ -103,7 +103,11 @@ class CartSummary extends StatelessWidget {
               },
             ),
             const SizedBox(height: 10.0),
-            Text('Coupon Discount: ${cartProvider.couponDiscount.toStringAsFixed(1)}'),
+            cartProvider.appliedCouponModel.level == 1
+                ? const Text('Coupon Per: 10%')
+                : cartProvider.appliedCouponModel.level == 2
+                    ? const Text('Coupon Per: 20%')
+                    : const Text("0%"),
             Text('Total: Rs${cartProvider.totalPrice.toStringAsFixed(1)}'),
             const SizedBox(height: 10.0),
             const CouponButton(),
@@ -129,15 +133,18 @@ class CouponButton extends StatelessWidget {
         ),
         const SizedBox(height: 5.0),
         ElevatedButton(
-          onPressed: cartProvider.totalPrice > 1000
+          onPressed: cartProvider.couponApplied
               ? () {
-                  cartProvider.applyCoupon(CouponModel(level: 2, discount: 20));
-                }
-              : cartProvider.totalPrice > 500
+              }
+              : cartProvider.totalPrice >= 1000
                   ? () {
-                      cartProvider.applyCoupon(CouponModel(level: 1, discount: 10));
+                      cartProvider.applyCoupon(CouponModel(level: 2, discount: 20));
                     }
-                  : null,
+                  : cartProvider.totalPrice >= 500
+                      ? () {
+                          cartProvider.applyCoupon(CouponModel(level: 1, discount: 10));
+                        }
+                      : null,
           child: const Text('Apply Coupon'),
         ),
       ],
