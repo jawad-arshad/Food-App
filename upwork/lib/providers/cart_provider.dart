@@ -15,10 +15,27 @@ class CartProvider with ChangeNotifier {
 
   void addItem(FoodItemModel foodItemModel) {
     items.add(CartCellModel(foodItemModel: foodItemModel));
-    totalPrice += foodItemModel.price;
-    if (foodItemModel.freeFood.isNotEmpty) {
-      items.add(CartCellModel(foodItemModel: _checkFreeItem(foodItemModel)));
+    couponValue = 0.0;
+    if (appliedCouponModel.level == 1 && totalPrice >= 500) {
+      totalPrice += foodItemModel.price;
+      if (foodItemModel.freeFood.isNotEmpty) {
+        items.add(CartCellModel(foodItemModel: _checkFreeItem(foodItemModel)));
+      }
+    } else if (appliedCouponModel.level == 2 && totalPrice >= 1000) {
+      totalPrice += foodItemModel.price;
+      if (foodItemModel.freeFood.isNotEmpty) {
+        items.add(CartCellModel(foodItemModel: _checkFreeItem(foodItemModel)));
+      }
+    } else {
+      totalPrice += foodItemModel.price;
+      appliedCouponModel = CouponModel();
+      couponValue = 0.0;
+      couponApplied = false;
+      if (foodItemModel.freeFood.isNotEmpty) {
+        items.add(CartCellModel(foodItemModel: _checkFreeItem(foodItemModel)));
+      }
     }
+
     notifyListeners();
   }
 

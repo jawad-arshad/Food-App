@@ -107,7 +107,7 @@ class CartSummary extends StatelessWidget {
                 ? const Text('Coupon Per: 10%')
                 : cartProvider.appliedCouponModel.level == 2
                     ? const Text('Coupon Per: 20%')
-                    : const Text("0%"),
+                    : const Text("Coupon Per: 0%"),
             Text('Total: Rs${cartProvider.totalPrice.toStringAsFixed(1)}'),
             const SizedBox(height: 10.0),
             const CouponButton(),
