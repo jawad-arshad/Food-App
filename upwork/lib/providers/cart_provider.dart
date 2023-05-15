@@ -24,18 +24,16 @@ class CartProvider with ChangeNotifier {
 
   void removeItem(CartCellModel item) {
     items.remove(item);
-    if(item.foodItemModel.name == "Salad"){
+    if (item.foodItemModel.name == "Salad") {
       items.remove(item);
       notifyListeners();
       return;
     }
     totalPrice -= item.foodItemModel.price;
-      if (appliedCouponModel != null) {
-      if (appliedCouponModel.level == 1) {
-        totalPrice = calculateDiscountedPrice(totalPrice, 10);
-      } else if (appliedCouponModel.level == 2) {
-        totalPrice = calculateDiscountedPrice(totalPrice, 20);
-      }
+    if (totalPrice >= 500 && appliedCouponModel.level == 1) {
+      totalPrice = calculateDiscountedPrice(totalPrice, 10);
+    } else if (totalPrice >= 1000 && appliedCouponModel.level == 2) {
+      totalPrice = calculateDiscountedPrice(totalPrice, 20);
     }
 
     if (items.isEmpty) {
@@ -46,14 +44,32 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void applyCoupon(CouponModel couponModel) {
+  double  applyCoupon(CouponModel couponModel) {
     appliedCouponModel = couponModel;
-    if (couponModel.level == 1) {
-      totalPrice -= totalPrice * 0.1;
-    } else if (couponModel.level == 2) {
-      totalPrice -= totalPrice * 0.2;
+    if (totalPrice >= 500 && couponModel.level == 1) {
+      double discount = totalPrice -= totalPrice * 0.1;
+      notifyListeners();
+      return discount;
+    } else if (totalPrice >= 1000 && couponModel.level == 2) {
+      double discount = totalPrice -= totalPrice * 0.2;
+      notifyListeners();
+      return discount;
+    } else {
+      notifyListeners();
+      return 0.0;
     }
-    notifyListeners();
+  }
+
+
+   double get couponDiscount {
+    if (appliedCouponModel != null) {
+      if (totalPrice >= 1000 && appliedCouponModel.level == 2) {
+        return calculateDiscountedPrice(totalPrice, appliedCouponModel.discount);
+      } else if (totalPrice >= 500 && appliedCouponModel.level == 1) {
+        return calculateDiscountedPrice(totalPrice, appliedCouponModel.discount);
+      }
+    }
+    return 0;
   }
 
   FoodItemModel _checkFreeItem(FoodItemModel dish) {
@@ -65,7 +81,7 @@ class CartProvider with ChangeNotifier {
     return freeItem;
   }
 
-   double calculateDiscountedPrice(double price, double discountPercent) {
+  double calculateDiscountedPrice(double price, double discountPercent) {
     double discount = price * (discountPercent / 100);
     return price - discount;
   }
